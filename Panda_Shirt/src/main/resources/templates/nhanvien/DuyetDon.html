@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{/SideBar::dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body th:fragment="duyetdon">
+<h2>Duyệt Đơn</h2>
+<div class="filter-container">
+    <h3><i class="fa-solid fa-filter" style="color: #000000;"></i> Bộ lọc</h3>
+    <hr>
+    <div class="filter-inputs">
+        <div class="filter-input">
+            <label for="title-author">Tên sản phẩm</label>
+            <input type="text" id="title-author" placeholder="Tên sản phẩm">
+        </div>
+        <div class="filter-input">
+            <label for="topic">Cổ áo</label>
+            <select id="topic">
+                <option value="">-- Chọn cổ áo --</option>
+            </select>
+        </div>
+        <div class="filter-input">
+            <label for="status">Danh mục</label>
+            <select id="status">
+                <option value="">-- Chọn danh mục --</option>
+            </select>
+        </div>
+        <div class="filter-input">
+            <label for="period">Trạng thái</label>
+            <select id="period">
+                <option value="month">-- Chọn trạng thaí --</option>
+            </select>
+        </div>
+    </div>
+    <div class="filter-buttons">
+        <button><i class="fa-solid fa-rotate-right" style="color: #ffffff;"></i> Làm mới</button>
+        <button><i class="fa-solid fa-magnifying-glass" style="color: #ffffff;"></i> Tìm kiếm</button>
+    </div>
+</div>
+<!-- Nút xem lịch sử nhân viên duyệt bài -->
+<div class="history-btn-container">
+    <a th:href="@{/panda/nhanvien/duyetdon/hienthi}">
+        <button class="btn btn-warning">Chờ duyệt</button>
+    </a>
+    <a th:href="@{/panda/nhanvien/duyetdon/hienthi/daduyet}">
+        <button class="btn btn-success">Đã duyệt</button>
+    </a>
+    <a th:href="@{/panda/nhanvien/duyetdon/hienthi/dahuy}">
+        <button class="btn btn-danger">Đã hủy</button>
+    </a>
+</div>
+
+<div class="container">
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Mã Hóa Đơn</th>
+            <th>Tên nhân viên</th>
+            <th>Tên Khách hàng</th>
+            <th>Ngày đặt</th>
+            <th>Thành tiền</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dd,i: ${listcd}">
+            <td th:text="${dd.hoaDon.mahoadon}"></td>
+            <td th:text="${dd.nhanVien.tennhanvien}"></td>
+            <td th:text="${dd.khachHang.tenkhachhang}"></td>
+            <td th:text="${dd.hoaDon.ngaymua != null ? #temporals.format(dd.hoaDon.ngaymua, 'dd/MM/yyyy') : ''}"></td>
+            <td th:text="${dd.hoaDon.thanhtien}"></td>
+            <td th:if="${dd.trangThai == 'Chờ duyệt'}">
+                <span class="status-label status-orange"
+                      th:text="${dd.trangThai}">
+                </span>
+            </td>
+            <td th:if="${dd.trangThai == 'Đã duyệt'}">
+                <span class="status-label status-green"
+                      th:text="${dd.trangThai}">
+                </span>
+            </td>
+            <td th:if="${dd.trangThai == 'Đã hủy'}">
+                <span class="status-label status-red"
+                      th:text="${dd.trangThai}">
+                </span>
+            </td>
+
+            <td class="btn-actions" style="gap: 10px">
+                <a th:unless="${dd.trangThai}=='Đã duyệt' or ${dd.trangThai}=='Đã hủy'">
+                    <i class="fa-regular fa-pen-to-square" style="color: #000000;font-size: 25px"></i>
+                </a>
+                <a>
+                    <i class="fa fa-eye" style="color: #000000;font-size: 25px"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        padding: 20px;
+    }
+
+    .filter-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-inputs {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        width: 18%;
+    }
+
+    .filter-input label {
+        margin-bottom: 5px;
+        padding-top: 30px;
+        font-weight: bold;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .filter-buttons {
+        text-align: center;
+    }
+
+    .filter-buttons button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #555;
+    }
+
+    .history-btn-container {
+        margin: 20px 0;
+        text-align: right;
+    }
+
+    .btn-warning {
+        color: white;
+    }
+
+    .container {
+        margin-top: 30px;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .status-label {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+    }
+
+    .status-green {
+        background-color: #4CAF50;
+    }
+
+    .status-orange {
+        background-color: #ff9800;
+    }
+
+    .status-red {
+        background-color: #dc3545;
+    }
+
+    .btn-actions {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
