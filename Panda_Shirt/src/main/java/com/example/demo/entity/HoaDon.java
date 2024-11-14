@@ -61,6 +61,7 @@ public class HoaDon {
     @Column(name = "GHI_CHU")
     private String ghiChu;
 
+
     @Column(name = "ACTIVE")
     private Boolean active;
 

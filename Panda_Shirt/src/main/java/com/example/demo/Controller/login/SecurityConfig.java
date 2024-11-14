@@ -74,6 +74,7 @@ public class SecurityConfig {
                 } else if (roles.contains("ROLE_NHANVIEN")) {
                     System.out.println("Chuyển hướng đến");
                     response.sendRedirect("/panda/nhanvien/banhang/hienthi");
+
                 } else {
                     System.out.println("Chuyển hướng mặc định đến /khach-hang");
                     response.sendRedirect("/panda/thongke");
@@ -115,6 +116,7 @@ public class SecurityConfig {
                         .build();
             };
         }
+
 
         @Bean
         public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
