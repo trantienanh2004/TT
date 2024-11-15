@@ -23,7 +23,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "CO_AO")
-public class CoAo {
+public class CoGiay {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

@@ -1,7 +1,6 @@
 package com.example.demo.Controller.admin.QLSP;
 
-import com.example.demo.entity.ChatLieu;
-import com.example.demo.entity.CoAo;
+import com.example.demo.entity.CoGiay;
 import com.example.demo.respository.CoAoRepository;
 import com.example.demo.service.CoAoService;
 import jakarta.validation.Valid;
@@ -15,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Controller
 @RequestMapping("/panda/coao")
-public class CoAoController {
+public class CoGiayController {
     @Autowired
     CoAoRepository coAoRepository;
     @Autowired
@@ -35,13 +33,13 @@ public class CoAoController {
         if (page < 0) {
             page = 0;
         }
-        Page<CoAo> listCA = coAoService.hienThiCA(page, tenca, trangthai);
+        Page<CoGiay> listCA = coAoService.hienThiCA(page, tenca, trangthai);
         model.addAttribute("totalPage", listCA.getTotalPages());
         model.addAttribute("currentPage", page);
         model.addAttribute("tenca", tenca);
         model.addAttribute("trangthai", trangthai);
         model.addAttribute("list", listCA.getContent());
-        model.addAttribute("CoAo", new CoAo());
+        model.addAttribute("CoAo", new CoGiay());
         model.addAttribute("pageSize", listCA.getSize());
         return "admin/QLSP/CoAo";
     }
@@ -50,15 +48,15 @@ public class CoAoController {
     public String showFormAdd(Model model) {
         String role = "admin"; //Hoặc lấy giá trị role từ session hoặc service
         model.addAttribute("role", role);
-        model.addAttribute("coAo", new CoAo());
-        CoAo coAo = new CoAo();
-        coAo.setTrangThai(0); // Giá trị mặc định là 0 (Hoạt động)
-        model.addAttribute("coAo", coAo);
+        model.addAttribute("coAo", new CoGiay());
+        CoGiay coGiay = new CoGiay();
+        coGiay.setTrangThai(0); // Giá trị mặc định là 0 (Hoạt động)
+        model.addAttribute("coAo", coGiay);
         return "admin/QLSP/ADD/addCoAo";
     }
 
     @PostMapping("/add")
-    public String add(Model model, @Valid @ModelAttribute CoAo coAo, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String add(Model model, @Valid @ModelAttribute CoGiay coGiay, BindingResult result, RedirectAttributes redirectAttributes) {
         String role = "admin";
         model.addAttribute("role", role);
 
@@ -68,35 +66,35 @@ public class CoAoController {
         }
 
         // Kiểm tra mã đã tồn tại
-        if (coAoRepository.existsCoAoByMa(coAo.getMa())) {
+        if (coAoRepository.existsCoAoByMa(coGiay.getMa())) {
             model.addAttribute("errorma", "Mã đã tồn tại");
             return "admin/QLSP/ADD/AddCoAo";
         }
 
         // Kiểm tra tên đã tồn tại
-        if (coAoRepository.existsCoAoByTen(coAo.getTen())) {
+        if (coAoRepository.existsCoAoByTen(coGiay.getTen())) {
             model.addAttribute("errorten", "Tên đã tồn tại");
             return "admin/QLSP/ADD/AddCoAo";
         }
 
         // Nếu ID không phải là null, thực hiện cập nhật
-        if (coAo.getId() != null) {
-            CoAo existingCoAo = coAoRepository.findById(coAo.getId()).orElse(null);
-            if (existingCoAo != null) {
-                existingCoAo.setMa(coAo.getMa());
-                existingCoAo.setTen(coAo.getTen());
-                existingCoAo.setTrangThai(coAo.getTrangThai());
-                existingCoAo.setNgaySua(LocalDateTime.now());
-                coAoRepository.save(existingCoAo);
+        if (coGiay.getId() != null) {
+            CoGiay existingCoGiay = coAoRepository.findById(coGiay.getId()).orElse(null);
+            if (existingCoGiay != null) {
+                existingCoGiay.setMa(coGiay.getMa());
+                existingCoGiay.setTen(coGiay.getTen());
+                existingCoGiay.setTrangThai(coGiay.getTrangThai());
+                existingCoGiay.setNgaySua(LocalDateTime.now());
+                coAoRepository.save(existingCoGiay);
             } else {
                 redirectAttributes.addFlashAttribute("ErrorStatusMessage", "Thêm không thành công!");
                 return "redirect:/panda/coao/hienthi"; // Redirect sau khi có lỗi
             }
         } else {
             // Thêm mới
-            coAo.setNgayTao(LocalDateTime.now());
-            coAo.setNgaySua(LocalDateTime.now());
-            coAoRepository.save(coAo);
+            coGiay.setNgayTao(LocalDateTime.now());
+            coGiay.setNgaySua(LocalDateTime.now());
+            coAoRepository.save(coGiay);
         }
 
         // Thêm thông báo thành công
@@ -108,13 +106,13 @@ public class CoAoController {
     public String showFormUpdate(Model model, @RequestParam("id") Integer id) {
         String role = "admin"; //Hoặc lấy giá trị role từ session hoặc service
         model.addAttribute("role", role);
-        model.addAttribute("coAo", new CoAo());
+        model.addAttribute("coAo", new CoGiay());
         model.addAttribute("coAo", coAoRepository.findById(id).get());
         return "admin/QLSP/UPDATE/UpdateCoAo";
     }
 
     @PostMapping("/update")
-    public String update(@Validated @ModelAttribute CoAo coAo, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String update(@Validated @ModelAttribute CoGiay coGiay, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         String role = "admin";
         model.addAttribute("role", role);
         if (bindingResult.hasErrors()) {
@@ -122,23 +120,23 @@ public class CoAoController {
         }
 
         // Nếu ID không phải là null, thực hiện cập nhật
-        if (coAo.getId() != null) {
-            CoAo existingCoAo = coAoRepository.findById(coAo.getId()).orElse(null);
-            if (existingCoAo != null) {
-                existingCoAo.setMa(coAo.getMa());
-                existingCoAo.setTen(coAo.getTen());
-                existingCoAo.setTrangThai(coAo.getTrangThai());
-                existingCoAo.setNgaySua(LocalDateTime.now());
-                coAoRepository.save(existingCoAo);
+        if (coGiay.getId() != null) {
+            CoGiay existingCoGiay = coAoRepository.findById(coGiay.getId()).orElse(null);
+            if (existingCoGiay != null) {
+                existingCoGiay.setMa(coGiay.getMa());
+                existingCoGiay.setTen(coGiay.getTen());
+                existingCoGiay.setTrangThai(coGiay.getTrangThai());
+                existingCoGiay.setNgaySua(LocalDateTime.now());
+                coAoRepository.save(existingCoGiay);
             } else {
                 redirectAttributes.addFlashAttribute("ErrorStatusMessage", "Thêm không thành công!");
                 return "redirect:/panda/coao//hienthi"; // Redirect sau khi có lỗi
             }
         } else {
             // Thêm mới
-            coAo.setNgayTao(LocalDateTime.now());
-            coAo.setNgaySua(LocalDateTime.now());
-            coAoRepository.save(coAo);
+            coGiay.setNgayTao(LocalDateTime.now());
+            coGiay.setNgaySua(LocalDateTime.now());
+            coAoRepository.save(coGiay);
         }
         redirectAttributes.addFlashAttribute("UpdateStatusMessage", "Cập nhật thành công !");
         return "redirect:/panda/coao//hienthi";
@@ -148,10 +146,10 @@ public class CoAoController {
         String role = "admin"; // Hoặc lấy giá trị role từ session hoặc service
         model.addAttribute("role", role);
 
-        CoAo coAo = coAoRepository.findById(id).orElse(null);
-        if (coAo != null) {
-            coAo.setTrangThai(coAo.getTrangThai() == 1 ? 0 : 1); // Đảo ngược trạng thái
-            coAoRepository.save(coAo);
+        CoGiay coGiay = coAoRepository.findById(id).orElse(null);
+        if (coGiay != null) {
+            coGiay.setTrangThai(coGiay.getTrangThai() == 1 ? 0 : 1); // Đảo ngược trạng thái
+            coAoRepository.save(coGiay);
         }
         redirectAttributes.addFlashAttribute("ChangesStatusMessage", "Chuyển trạng thái thành công !");
         return "redirect:/panda/coao/hienthi";

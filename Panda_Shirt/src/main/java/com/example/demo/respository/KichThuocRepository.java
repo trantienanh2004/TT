@@ -1,8 +1,6 @@
 package com.example.demo.respository;
 
-import com.example.demo.entity.CoAo;
 import com.example.demo.entity.KichThuoc;
-import com.example.demo.entity.MauSac;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

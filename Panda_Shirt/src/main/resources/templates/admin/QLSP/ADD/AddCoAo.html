@@ -58,7 +58,7 @@
             </h2>
         </div>
         <div class="card-body p-4">
-            <form class="login-form" th:method="post" th:action="@{/panda/coao/add}" th:object="${coAo}">
+            <form class="login-form" th:method="post" th:action="@{/panda/coao/add}" th:object="${coGiay}">
                 <div class="form-group">
                     <label>Mã cổ áo:</label>
                     <input type="text" class="form-control" name="ma" th:field="*{ma}">

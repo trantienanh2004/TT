@@ -75,30 +75,30 @@
         </thead>
         <tbody>
 
-        <tr th:each="coAo,i : ${list}">
+        <tr th:each="coGiay,i : ${list}">
             <td th:text="${(currentPage * pageSize) + i.index + 1}"></td>
-            <td th:text="${coAo.ma}"></td>
-            <td th:text="${coAo.ten}"></td>
-            <td th:text="${coAo.ngayTao != null? #temporals.format(coAo.ngayTao, 'dd/MM/yyyy'): 'chưa có'}"></td>
-            <td th:text="${coAo.ngaySua != null? #temporals.format(coAo.ngaySua, 'dd/MM/yyyy'): 'chưa có'}"></td>
-            <td th:if="${coAo.trangThai} == 0">
+            <td th:text="${coGiay.ma}"></td>
+            <td th:text="${coGiay.ten}"></td>
+            <td th:text="${coGiay.ngayTao != null? #temporals.format(coGiay.ngayTao, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:text="${coGiay.ngaySua != null? #temporals.format(coGiay.ngaySua, 'dd/MM/yyyy'): 'chưa có'}"></td>
+            <td th:if="${coGiay.trangThai} == 0">
                 <span class="status-label status-green"
-                      th:text="${coAo.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
+                      th:text="${coGiay.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
                 </span>
             </td>
-            <td th:if="${coAo.trangThai} == 1 ">
+            <td th:if="${coGiay.trangThai} == 1 ">
                 <span class="status-label status-orange"
-                      th:text="${coAo.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
+                      th:text="${coGiay.trangThai == 0 ? 'Hoạt động':'Ngừng hoạt động'}">
                 </span>
             </td>
             <td>
-                <a style="margin-right: 10px" th:href="@{/panda/coao/update(id=${coAo.id})}"><i class="fa-regular fa-pen-to-square" style="color: #000000;font-size: 25px"></i></a>
-                <a th:href="@{/panda/coao/change(id=${coAo.id})}">
-                    <i th:if="${coAo.trangThai == 0}">
+                <a style="margin-right: 10px" th:href="@{/panda/coao/update(id=${coGiay.id})}"><i class="fa-regular fa-pen-to-square" style="color: #000000;font-size: 25px"></i></a>
+                <a th:href="@{/panda/coao/change(id=${coGiay.id})}">
+                    <i th:if="${coGiay.trangThai == 0}">
                         <i class="fa-solid fa-toggle-on"  style="color: #00040a;font-size: 25px">
                         </i>
                     </i>
-                    <i th:if="${coAo.trangThai == 1}">
+                    <i th:if="${coGiay.trangThai == 1}">
                         <i class="fa-solid fa-toggle-off" style="color: #00040a;font-size: 25px">
                         </i>
                     </i>
