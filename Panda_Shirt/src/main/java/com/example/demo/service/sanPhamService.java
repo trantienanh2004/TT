@@ -11,8 +11,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SanPhamService {
@@ -60,7 +68,7 @@ public class SanPhamService {
     public List<ThuongHieu> getallthuonghieu() {
         return thuongHieuRepository.findAll();
     }
-    public List<CoGiay> getallcoao() {
+    public List<CoAo> getallcoao() {
         return coAoRepository.findAll();
     }
     public List<MauSac> getallmausac() {
@@ -242,8 +250,8 @@ public class SanPhamService {
         thuongHieuRepository.save(thuongHieu);
     }
 
-    public void addcoao(CoGiay coGiay) {
-        coAoRepository.save(coGiay);
+    public void addcoao(CoAo coAo) {
+        coAoRepository.save(coAo);
     }
 
     @Transactional
@@ -280,9 +288,9 @@ public class SanPhamService {
                 .orElseThrow(() -> new EntityNotFoundException("Nhà sản xuất không tìm thấy với ID: " + sanPhamDTO.getNhaSanXuatId()));
         sanPham.setNhaSanXuat(nhaSanXuat);
 
-        CoGiay coGiay = coAoRepository.findById(sanPhamDTO.getCoAoId())
+        CoAo coAo = coAoRepository.findById(sanPhamDTO.getCoAoId())
                 .orElseThrow(() -> new EntityNotFoundException("Cổ áo không tìm thấy với ID: " + sanPhamDTO.getCoAoId()));
-        sanPham.setCoAo(coGiay);
+        sanPham.setCoAo(coAo);
 
         // Duyệt qua từng chi tiết sản phẩm trong DTO
         if (sanPhamDTO.getChiTietSanPham() != null) {

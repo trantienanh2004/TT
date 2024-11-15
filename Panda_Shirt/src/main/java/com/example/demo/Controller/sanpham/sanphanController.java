@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -301,19 +302,19 @@ public class sanphanController {
 
 
     @PostMapping("/addCoAo")
-    public ResponseEntity<CoGiay> addCollar(@RequestBody laytamDTO laytamDTO) {
+    public ResponseEntity<CoAo> addCollar(@RequestBody laytamDTO laytamDTO) {
         if (laytamDTO == null) {
             return ResponseEntity.badRequest().body(null);
         }
 
-        CoGiay coGiay = new CoGiay();
-        coGiay.setTen(laytamDTO.getName());
-        coGiay.setTrangThai(0);
-        coGiay.setNgayTao(LocalDateTime.now());
-        coGiay.setMa(quenmatkhauService.random());
+        CoAo coAo = new CoAo();
+        coAo.setTen(laytamDTO.getName());
+        coAo.setTrangThai(0);
+        coAo.setNgayTao(LocalDateTime.now());
+        coAo.setMa(quenmatkhauService.random());
         try {
-            sanPhamService.addcoao(coGiay);
-            return ResponseEntity.status(HttpStatus.CREATED).body(coGiay);
+            sanPhamService.addcoao(coAo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(coAo);
         } catch (Exception e) {
             logger.error("Error adding collar: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

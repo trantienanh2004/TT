@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.CoGiay;
+import com.example.demo.entity.CoAo;
+import com.example.demo.entity.KichThuoc;
 import com.example.demo.respository.CoAoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,7 @@ public class CoAoService {
     CoAoRepository coAoRepository;
 
     private final int size = 5;
-    public Page<CoGiay> hienThiCA(int page, String tenca, Integer trangthai) {
+    public Page<CoAo> hienThiCA(int page, String tenca, Integer trangthai) {
         if (page < 0) {
             throw new IllegalArgumentException("Chỉ số trang không được nhỏ hơn số không");
         }

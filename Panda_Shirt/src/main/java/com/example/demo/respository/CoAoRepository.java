@@ -1,6 +1,8 @@
 package com.example.demo.respository;
 
-import com.example.demo.entity.CoGiay;
+import com.example.demo.entity.ChatLieu;
+import com.example.demo.entity.CoAo;
+import com.example.demo.entity.NhaSanXuat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,14 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CoAoRepository extends JpaRepository<CoGiay,Integer> {
+public interface CoAoRepository extends JpaRepository<CoAo,Integer> {
     boolean existsCoAoByMa(String ma);
     boolean existsCoAoByTen(String ten);
-    Optional<CoGiay> findByTen(String name);
+    Optional<CoAo> findByTen(String name);
 
-    @Query("SELECT ca FROM CoGiay ca WHERE " +
+    @Query("SELECT ca FROM CoAo ca WHERE " +
             "(?1 IS NULL OR ca.ten LIKE %?1%) AND " +
             "(?2 IS NULL OR ca.trangThai = ?2)")
-    Page<CoGiay> findByTenAndTrangthaiCA(String tenca, Integer trangThai, Pageable pageable);
+    Page<CoAo> findByTenAndTrangthaiCA(String tenca, Integer trangThai, Pageable pageable);
 
 }

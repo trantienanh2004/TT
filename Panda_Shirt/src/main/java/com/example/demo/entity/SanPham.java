@@ -62,7 +62,7 @@ public class SanPham {
 
     @ManyToOne
     @JoinColumn(name = "ID_CO_AO", referencedColumnName = "id")
-    private CoGiay coGiay;
+    private CoAo coAo;
 
     @OneToOne
     @JoinColumn(name = "ID_CHAT_LIEU", referencedColumnName = "id")
