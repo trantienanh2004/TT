@@ -19,7 +19,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/panda/coao")
-public class CoGiayController {
+public class CoAoController {
     @Autowired
     CoAoRepository coAoRepository;
     @Autowired
@@ -132,7 +132,7 @@ public class CoGiayController {
                 coAoRepository.save(existingCoAo);
             } else {
                 redirectAttributes.addFlashAttribute("ErrorStatusMessage", "Thêm không thành công!");
-                return "redirect:/panda/coao//hienthi"; // Redirect sau khi có lỗi
+                return "redirect:/panda/coao/hienthi"; // Redirect sau khi có lỗi
             }
         } else {
             // Thêm mới
@@ -141,7 +141,7 @@ public class CoGiayController {
             coAoRepository.save(coAo);
         }
         redirectAttributes.addFlashAttribute("UpdateStatusMessage", "Cập nhật thành công !");
-        return "redirect:/panda/coao//hienthi";
+        return "redirect:/panda/coao/hienthi";
     }
     @GetMapping("/change")
     public String changeStatus(@RequestParam("id") int id, Model model, RedirectAttributes redirectAttributes) {

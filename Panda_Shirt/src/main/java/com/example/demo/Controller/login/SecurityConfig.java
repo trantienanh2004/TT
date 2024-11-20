@@ -3,6 +3,7 @@ package com.example.demo.Controller.login;
 import com.example.demo.DTO.ChiTietVaiTroDTO;
 import com.example.demo.DTO.TaiKhoanDTO;
 import com.example.demo.service.TaiKhoanService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -24,9 +25,11 @@ import java.util.Set;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = { "/panda/thongke","/panda/login","/panda/vaitro","/Image/**","panda/mahoa"};
-    private final String[] QUANLY_ENDPOINTS= {"/panda/vaitro"};
-    private final String[] NHANVIEN_ENDPOINTS= {"/panda/nhanvien/banhang/hienthi"};
+
+    private final String[] PUBLIC_ENDPOINTS = { "/panda/thongke","/panda/login","/Image/**","panda/mahoa","/panda/banhangoffline","/panda/giohang"};
+    private final String[] QUANLY_ENDPOINTS= {};
+    private final String[] NHANVIEN_ENDPOINTS= {};
+
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http, TaiKhoanService taiKhoanService) throws Exception {
             http
@@ -38,7 +41,8 @@ public class SecurityConfig {
                                     .requestMatchers(QUANLY_ENDPOINTS).hasRole("QUANLY")
                                     .requestMatchers(NHANVIEN_ENDPOINTS).hasAnyRole("QUANLY","NHANVIEN")
 //                        .requestMatchers("/").hasAnyRole("CUSTOMER")
-                                    .anyRequest().authenticated()
+//                                    .anyRequest().authenticated()
+                                    .anyRequest().permitAll()
                     )
                     .formLogin(form -> form
                             .loginPage("/panda/login")
@@ -48,8 +52,8 @@ public class SecurityConfig {
                             .passwordParameter("password")
                     )
                     .logout(logoff -> logoff
-                            .logoutUrl("/logoff")
-                            .logoutSuccessUrl("/")
+                            .logoutUrl("/panda/logout")
+                            .logoutSuccessUrl("/panda/login")
                             .permitAll()
                     )
                     .userDetailsService(userDetailsService(taiKhoanService));
@@ -58,33 +62,39 @@ public class SecurityConfig {
         }
 
 
-        @Bean
-        public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-            return (request, response, authentication) -> {
-                // Lấy vai trò của người dùng
-                Set<String> roles = AuthorityUtils
-                        .authorityListToSet(authentication.getAuthorities());
-                // In log để kiểm tra vai trò hiện tại của người dùng
-                System.out.println("Các vai trò của người dùng: " + roles);
+    // Thêm vào lớp xử lý đăng nhập hoặc lớp bảo mật
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            // Lấy vai trò của người dùng
+            Set<String> roles = AuthorityUtils
+                    .authorityListToSet(authentication.getAuthorities());
 
-                // Điều hướng dựa trên vai trò
-                if (roles.contains("ROLE_QUANLY")) {
-                    System.out.println("Chuyển hướng đến /thongke");
-                    response.sendRedirect("/panda/vaitro");
-                } else if (roles.contains("ROLE_NHANVIEN")) {
-                    System.out.println("Chuyển hướng đến");
-                    response.sendRedirect("/panda/nhanvien/banhang/hienthi");
+            // In log để kiểm tra vai trò hiện tại của người dùng
+            System.out.println("Các vai trò của người dùng: " + roles);
 
-                } else {
-                    System.out.println("Chuyển hướng mặc định đến /khach-hang");
-                    response.sendRedirect("/panda/thongke");
-                }
-            };
-        }
+            // Log thông tin session
+            HttpSession session = request.getSession();
+            System.out.println("Session ID: " + session.getId());
+
+            // Điều hướng dựa trên vai trò
+            if (roles.contains("ROLE_QUANLY")) {
+                System.out.println("Chuyển hướng đến /panda/vaitro");
+                response.sendRedirect("/panda/vaitro");
+            } else if (roles.contains("ROLE_NHANVIEN")) {
+                System.out.println("Chuyển hướng đến /panda/nhanvien/banhang/hienthi");
+                response.sendRedirect("/panda/nhanvien/banhang/hienthi");
+            } else {
+                System.out.println("Chuyển hướng mặc định đến /panda/thongke");
+                response.sendRedirect("/panda/thongke");
+            }
+        };
+    }
 
 
 
-        @Bean
+
+    @Bean
         public UserDetailsService userDetailsService(TaiKhoanService taiKhoanService) {
             return tenDangNhap -> {
                 TaiKhoanDTO taiKhoanDto = taiKhoanService.findByTenDangNhap(tenDangNhap);
@@ -116,7 +126,6 @@ public class SecurityConfig {
                         .build();
             };
         }
-
 
         @Bean
         public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {

@@ -45,9 +45,6 @@ public class SanPhamChiTiet {
 
     @ManyToOne
     @JoinColumn(name = "ID_SAN_PHAM", referencedColumnName = "id")
-////    @JsonIgnore // Ngăn không cho chuyển đổi đối tượng này thành JSON
-////    @JsonBackReference
-//
     private SanPham sanPham;
 
     @ManyToOne

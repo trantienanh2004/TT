@@ -24,5 +24,4 @@ public interface sanPhamRepository extends JpaRepository<SanPham,Integer> {
         List<SanPham> findSanPhamWithDetails();
 
 
-
 }
