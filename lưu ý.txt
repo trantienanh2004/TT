@@ -1,5 +1,0 @@
-hiện dự án thực tập của em vẫn chưa hoàn thành,
-nên có 1 số việc phải làm thủ công để chạy dự án
-
-- để mã hóa mật khẩu tài khoản nhanh : http://localhost:8080/panda/mahoa
-
