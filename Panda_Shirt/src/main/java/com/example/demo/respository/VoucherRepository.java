@@ -1,5 +1,6 @@
 package com.example.demo.respository;
 
+import com.example.demo.entity.HoaDon;
 import com.example.demo.entity.NhanVien;
 import com.example.demo.entity.Voucher;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
@@ -22,6 +24,17 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     Voucher findByTenAndIdNot(String ten, Integer id);
 
 
+//@Query("SELECT vc FROM Voucher vc WHERE " +
+//        "(?1 IS NULL OR vc.ma LIKE CONCAT('%', ?1, '%')) AND " +
+//        "(?2 IS NULL OR vc.ten LIKE CONCAT('%', ?2, '%')) AND " +
+//        "(?3 IS NULL OR vc.ngaybatdau >= ?3) AND " +
+//        "(?4 IS NULL OR vc.ngayketthuc <= ?4) AND " +
+//        "(?5 IS NULL OR vc.trangThai LIKE CONCAT('%', ?5, '%')) " +
+//        "ORDER BY vc.ngaytao DESC")
+//Page<Voucher> findByMaAndTenAndTrangthaiVC(String ma, String ten, LocalDate startDate, LocalDate endDate, String trangThai, Pageable pageable);
+
+    Optional<Voucher> findByMa(String ma);
+
 //    @Query(value = "SELECT * FROM Voucher vc WHERE " +
 //            "(?1 IS NULL OR vc.ma_khuyen_mai LIKE %?1%) AND " +
 //            "(?2 IS NULL OR vc.ten_khuyen_mai LIKE %?2%) AND " +
@@ -31,16 +44,18 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 //            "ORDER BY vc.ngay_tao DESC",
 //            nativeQuery = true)
 //
+
 @Query("SELECT vc FROM Voucher vc WHERE " +
-        "(?1 IS NULL OR vc.ma LIKE CONCAT('%', ?1, '%')) AND " +
-        "(?2 IS NULL OR vc.ten LIKE CONCAT('%', ?2, '%')) AND " +
+        "(?1 IS NULL OR vc.ma LIKE %?1%) AND " +
+        "(?2 IS NULL OR vc.ten LIKE %?2%) AND " +
         "(?3 IS NULL OR vc.ngaybatdau >= ?3) AND " +
         "(?4 IS NULL OR vc.ngayketthuc <= ?4) AND " +
-        "(?5 IS NULL OR vc.trangThai LIKE CONCAT('%', ?5, '%')) " +
+        "(?5 IS NULL OR vc.trangThai = ?5) " +
         "ORDER BY vc.ngaytao DESC")
-Page<Voucher> findByMaAndTenAndTrangthaiVC(String ma, String ten, LocalDate startDate, LocalDate endDate, String trangThai, Pageable pageable);
+Page<Voucher> findByMaAndTenAndTrangthaiVC(String ma, String ten,LocalDate startDate, LocalDate endDate, Integer trangThai, Pageable pageable);
 
-    @Query(value = "SELECT * FROM voucher WHERE TRANG_THAI IN (N'Sắp hoạt động', N'Đang hoạt động') " +
-            "ORDER BY NGAY_TAO DESC;", nativeQuery = true)
+    @Query(value = "SELECT * FROM voucher WHERE Loai_khach_hang = 0 " +
+            "and TRANG_THAI = 0 or trang_thai = 1 " +
+            "ORDER BY NGAY_TAO DESC", nativeQuery = true)
     List<Voucher> chonVC();
 }

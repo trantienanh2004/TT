@@ -1,9 +1,6 @@
 package com.example.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "SAN_PHAM_CHI_TIET")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class SanPhamChiTiet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,17 +41,32 @@ public class SanPhamChiTiet {
     @Column(name = "TRANG_THAI")
     private boolean trangthai;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_SAN_PHAM", referencedColumnName = "id")
-    private SanPham sanPham;
-
-    @ManyToOne
-    @JoinColumn(name = "ID_KICH_THUOC")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_KICH_THUOC", referencedColumnName = "id")
+    @JsonManagedReference // Hoặc không dùng gì nếu không cần vòng lặp
     private KichThuoc kichThuoc;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_MAU_SAC")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_MAU_SAC", referencedColumnName = "id")
+    @JsonManagedReference
     private MauSac mauSac;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_SAN_PHAM", referencedColumnName = "id")
+    @JsonBackReference
+    private SanPham sanPham;
+
+
+//    @ManyToOne
+//    @JoinColumn(name = "ID_KICH_THUOC")
+//
+//    private KichThuoc kichThuoc;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "ID_MAU_SAC")
+//
+//    private MauSac mauSac;
+
 
     public SanPhamChiTiet(Integer id) {
         this.id = id;
@@ -63,6 +76,14 @@ public class SanPhamChiTiet {
     @Column(name = "ANH_SAN_PHAM_CHI_TIET")
     private byte[] anhSanPhamChiTiet;
 
+    public String FormatteddonGia() {
+        try {
+            DecimalFormat formatter = new DecimalFormat("#,###");
+            return formatter.format(dongia);
+        } catch (NumberFormatException e) {
+            return "Không hợp lệ"; //
+        }
+    }
 
     @Override
     public String toString() {

@@ -280,14 +280,14 @@ TEN_KHUYEN_MAI NVARCHAR(255),
 NGAY_BAT_DAU DATETIME DEFAULT GETDATE(),
 NGAY_KET_THUC DATETIME ,
 MUC_GIAM VARCHAR(100),
-TRANG_THAI NVARCHAR(255),
+TRANG_THAI int,
 Loai Bit,
 So_Luong Nvarchar(10),
 TINH_TRANG BIT,
 NGAY_TAO DATETIME ,
 NGAY_SUA DATETIME ,
 DIEU_KIEN_KHUYEN_MAI NVARCHAR(255),
-
+Loai_khach_hang BIT
 )
 GO
 IF OBJECT_ID('HOA_DON') IS NOT NULL
@@ -536,6 +536,7 @@ VALUES
 SELECT * FROM danh_muc WHERE TEN_DANH_MUC = 'ad';
 
 SELECT * FROM mau_sac
+SELECT * FROM SAN_PHAM
 SELECT * FROM SAN_PHAM_CHI_TIET
 select * from THUONG_HIEU
 select * from NHAN_VIEN
@@ -549,6 +550,8 @@ select * from NHAN_VIEN
 select * from VAI_TRO
 select * from CHI_TIET_VAI_TRO
 SELECT * FROM SAN_PHAM_CHI_TIET
+Select * from voucher
+
 
 SELECT * FROM gio_hang
 
@@ -584,20 +587,22 @@ select * from nhan_vien
 select * from danh_muc 
 select * from HOA_DON_chi_tiet
 
-select * from DON_HANG
+select * from HOA_DON
 delete danh_muc where TEN_DANH_MUC = 'áo có quai'
 
 SELECT * FROM Voucher
 WHERE trang_Thai  LIKE N'Đang hoạt động';
 
+ALTER TABLE Voucher
+ALTER COLUMN Trang_thai int
 
-update HOA_DON
-set ID_NHAN_VIEN = 1
-where id  = 1
+update hoa_don
+set thanh_tien  = 1023102
+where ID = 23
 
 
-ALTER TABLE VOUCHER
-ADD LOAI_KHACH_HANG BIT;
+ALTER TABLE don_hang
+ADD trang_thai_offline BIT;
 
 
 ----test ở đây nè , đăng nhập ở đây này

@@ -78,7 +78,7 @@ public class Voucher {
 
 
     @Column(name = "TRANG_THAI")
-    private String trangThai;
+    private int trangThai;
 
     public String getFormattedMucGiam() {
         try {
@@ -90,5 +90,14 @@ public class Voucher {
         }
     }
 
+    public String getFormattedDieukien() {
+        try {
+            double dieukien = Double.parseDouble(this.dieuKien);
+            DecimalFormat formatter = new DecimalFormat("#,###");
+            return formatter.format(dieukien);
+        } catch (NumberFormatException e) {
+            return "Không hợp lệ"; //
+        }
+    }
 
 }

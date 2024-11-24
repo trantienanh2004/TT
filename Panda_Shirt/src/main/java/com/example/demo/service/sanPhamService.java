@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class SanPhamService {
     @Autowired
-    sanPhamRepository sanPhamRepository;
+    SanPhamRepository sanPhamRepository;
     @Autowired
     ChatLieuRespository chatLieuRespository;
     @Autowired
@@ -77,7 +77,9 @@ public class SanPhamService {
     public List<KichThuoc> getallkichco() {
         return kichThuocRepository.findAll();
     }
-
+    public void saveSanPhamChiTiet(SanPhamChiTiet sanPhamChiTiet) {
+        sanPhamChiTietRepository.save(sanPhamChiTiet);
+    }
 
     private List<SanPhamChiTiet> temporarySanPhamChiTietList = new ArrayList<>();
 
@@ -254,94 +256,190 @@ public class SanPhamService {
         coAoRepository.save(coAo);
     }
 
-    @Transactional
-    public void saveSanPham(SanPhamDTO sanPhamDTO) {
-        if (sanPhamDTO == null || sanPhamDTO.getTenSanPham() == null) {
-            throw new IllegalArgumentException("Thông tin sản phẩm không hợp lệ!");
-        }
-
-        SanPham sanPham = sanPhamRepository.findById(sanPhamDTO.getTenSanPham())
-                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tìm thấy với tên: " + sanPhamDTO.getTenSanPham()));
-
-        int totalQuantity = sanPhamDTO.getChiTietSanPham() != null
-                ? sanPhamChiTietRepository.findBySanPhamId(sanPham.getId()).stream()
-                .mapToInt(chitiet -> chitiet.getSoluongsanpham() != null ? chitiet.getSoluongsanpham() : 0)
-                .sum()
-                : 0;
-        sanPham.setSoluongsp(totalQuantity);
-        System.out.println("Tổng số lượng sản phẩm: " + totalQuantity);
-
-        // Tìm các thông tin liên quan như danh mục, thương hiệu, chất liệu, nhà sản xuất, cổ áo
-        DanhMuc danhMuc = danhMucRepository.findById(sanPhamDTO.getDanhMucId())
-                .orElseThrow(() -> new EntityNotFoundException("Danh mục không tìm thấy với ID: " + sanPhamDTO.getDanhMucId()));
-        sanPham.setDanhMuc(danhMuc);
-
-        ThuongHieu thuongHieu = thuongHieuRepository.findById(sanPhamDTO.getThuongHieuId())
-                .orElseThrow(() -> new EntityNotFoundException("Thương hiệu không tìm thấy với ID: " + sanPhamDTO.getThuongHieuId()));
-        sanPham.setThuongHieu(thuongHieu);
-
-        ChatLieu chatLieu = chatLieuRespository.findById(sanPhamDTO.getChatLieuId())
-                .orElseThrow(() -> new EntityNotFoundException("Chất liệu không tìm thấy với ID: " + sanPhamDTO.getChatLieuId()));
-        sanPham.setChatLieu(chatLieu);
-
-        NhaSanXuat nhaSanXuat = nsxRepository.findById(sanPhamDTO.getNhaSanXuatId())
-                .orElseThrow(() -> new EntityNotFoundException("Nhà sản xuất không tìm thấy với ID: " + sanPhamDTO.getNhaSanXuatId()));
-        sanPham.setNhaSanXuat(nhaSanXuat);
-
-        CoAo coAo = coAoRepository.findById(sanPhamDTO.getCoAoId())
-                .orElseThrow(() -> new EntityNotFoundException("Cổ áo không tìm thấy với ID: " + sanPhamDTO.getCoAoId()));
-        sanPham.setCoAo(coAo);
-
-        // Duyệt qua từng chi tiết sản phẩm trong DTO
-        if (sanPhamDTO.getChiTietSanPham() != null) {
-            List<SanPhamChiTiet> existingChiTietList = sanPham.getSanPhamChiTietList();
-
-            sanPhamDTO.getChiTietSanPham().forEach(chiTietDTO -> {
-                String colorInput = chiTietDTO.getMauSac();
-                String color = colorInput.contains(":") ? colorInput.split(":")[1].trim() : colorInput;
-
-                // Tìm màu sắc và kích thước
-                MauSac mauSac = mauSacRepsitory.findByTen(color)
-                        .orElseThrow(() -> new EntityNotFoundException("Màu sắc không tìm thấy với tên: " + color));
-                KichThuoc kichThuoc = kichThuocRepository.findByten(chiTietDTO.getKichThuoc())
-                        .orElseThrow(() -> new EntityNotFoundException("Kích thước không tìm thấy với tên: " + chiTietDTO.getKichThuoc()));
-
-                SanPhamChiTiet existingChiTiet = existingChiTietList.stream()
-                        .filter(chiTiet -> chiTiet.getMauSac().equals(mauSac) && chiTiet.getKichThuoc().equals(kichThuoc))
-                        .findFirst()
-                        .orElse(null);
-
-                // Sử dụng images từ chiTietDTO
-//                byte[] imageBytes = chiTietDTO.getImages();
-//                if (imageBytes != null) {
-//                    // Chuyển đổi mảng byte thành chuỗi base64
-//                    String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-//                    System.out.println("Base64 Image: " + base64Image);
+//    @Transactional
+//    public void saveSanPham(SanPhamDTO sanPhamDTO) {
+//        if (sanPhamDTO == null || sanPhamDTO.getTenSanPham() == null) {
+//            throw new IllegalArgumentException("Thông tin sản phẩm không hợp lệ!");
+//        }
+//
+//        SanPham sanPham = sanPhamRepository.findById(sanPhamDTO.getTenSanPham())
+//                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tìm thấy với tên: " + sanPhamDTO.getTenSanPham()));
+//
+//
+//
+//// Lấy tất cả chi tiết sản phẩm theo ID của sản phẩm
+//        List<SanPhamChiTiet> chiTietSanPhamList = sanPhamChiTietRepository.findBySanPhamId(sanPham.getId());
+//
+//// In ra các chi tiết sản phẩm để kiểm tra
+//        chiTietSanPhamList.forEach(chitiet -> {
+//            System.out.println("ID: " + chitiet.getId() + ", Số lượng: " + chitiet.getSoluongsanpham());
+//        });
+//
+//// Kiểm tra và tính tổng số lượng sản phẩm từ chi tiết sản phẩm
+//        int totalQuantity = chiTietSanPhamList.stream()
+//                .filter(chitiet -> chitiet.getSoluongsanpham() != null)
+//                .mapToInt(SanPhamChiTiet::getSoluongsanpham)
+//                .sum();
+//        sanPham.setSoluongsp(totalQuantity);
+//
+//// In ra tổng số lượng sản phẩm
+//        System.out.println("Tổng số lượng sản phẩm: " + totalQuantity);
+//
+//
+//
+//        // Tìm các thông tin liên quan như danh mục, thương hiệu, chất liệu, nhà sản xuất, cổ áo
+//        DanhMuc danhMuc = danhMucRepository.findById(sanPhamDTO.getDanhMucId())
+//                .orElseThrow(() -> new EntityNotFoundException("Danh mục không tìm thấy với ID: " + sanPhamDTO.getDanhMucId()));
+//        sanPham.setDanhMuc(danhMuc);
+//
+//        ThuongHieu thuongHieu = thuongHieuRepository.findById(sanPhamDTO.getThuongHieuId())
+//                .orElseThrow(() -> new EntityNotFoundException("Thương hiệu không tìm thấy với ID: " + sanPhamDTO.getThuongHieuId()));
+//        sanPham.setThuongHieu(thuongHieu);
+//
+//        ChatLieu chatLieu = chatLieuRespository.findById(sanPhamDTO.getChatLieuId())
+//                .orElseThrow(() -> new EntityNotFoundException("Chất liệu không tìm thấy với ID: " + sanPhamDTO.getChatLieuId()));
+//        sanPham.setChatLieu(chatLieu);
+//
+//        NhaSanXuat nhaSanXuat = nsxRepository.findById(sanPhamDTO.getNhaSanXuatId())
+//                .orElseThrow(() -> new EntityNotFoundException("Nhà sản xuất không tìm thấy với ID: " + sanPhamDTO.getNhaSanXuatId()));
+//        sanPham.setNhaSanXuat(nhaSanXuat);
+//
+//        CoAo coAo = coAoRepository.findById(sanPhamDTO.getCoAoId())
+//                .orElseThrow(() -> new EntityNotFoundException("Cổ áo không tìm thấy với ID: " + sanPhamDTO.getCoAoId()));
+//        sanPham.setCoAo(coAo);
+//
+//        // Duyệt qua từng chi tiết sản phẩm trong DTO
+//        if (sanPhamDTO.getChiTietSanPham() != null) {
+//            List<SanPhamChiTiet> existingChiTietList = sanPham.getSanPhamChiTietList();
+//
+//            sanPhamDTO.getChiTietSanPham().forEach(chiTietDTO -> {
+//                String colorInput = chiTietDTO.getMauSac();
+//                String color = colorInput.contains(":") ? colorInput.split(":")[1].trim() : colorInput;
+//
+//                // Tìm màu sắc và kích thước
+//                MauSac mauSac = mauSacRepsitory.findByTen(color)
+//                        .orElseThrow(() -> new EntityNotFoundException("Màu sắc không tìm thấy với tên: " + color));
+//                KichThuoc kichThuoc = kichThuocRepository.findByten(chiTietDTO.getKichThuoc())
+//                        .orElseThrow(() -> new EntityNotFoundException("Kích thước không tìm thấy với tên: " + chiTietDTO.getKichThuoc()));
+//
+//                SanPhamChiTiet existingChiTiet = existingChiTietList.stream()
+//                        .filter(chiTiet -> chiTiet.getMauSac().equals(mauSac) && chiTiet.getKichThuoc().equals(kichThuoc))
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                // Sử dụng images từ chiTietDTO
+////                byte[] imageBytes = chiTietDTO.getImages();
+////                if (imageBytes != null) {
+////                    // Chuyển đổi mảng byte thành chuỗi base64
+////                    String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+////                    System.out.println("Base64 Image: " + base64Image);
+////                } else {
+////                    System.out.println("Không có dữ liệu hình ảnh.");
+////                }
+////                System.out.println("Đang kiểm tra hình ảnh: " + (imageBytes != null ? imageBytes.length : "null"));
+////                if (imageBytes == null || imageBytes.length == 0) {
+////                    throw new IllegalArgumentException("Hình ảnh không hợp lệ!");
+////                }
+//
+//                if (existingChiTiet != null) {
+//                    existingChiTiet.setSoluongsanpham(existingChiTiet.getSoluongsanpham() + chiTietDTO.getSoLuong());
 //                } else {
-//                    System.out.println("Không có dữ liệu hình ảnh.");
+//                    SanPhamChiTiet newChiTiet = new SanPhamChiTiet();
+//                    newChiTiet.setMauSac(mauSac);
+//                    newChiTiet.setKichThuoc(kichThuoc);
+//                    newChiTiet.setDongia(chiTietDTO.getGia());
+//                    newChiTiet.setSoluongsanpham(chiTietDTO.getSoLuong());
+//                    newChiTiet.setSanPham(sanPham);
+//                    newChiTiet.setAnhSanPhamChiTiet(null);
+////                    System.out.println("Mã ảnh: " + (imageBytes != null ? imageBytes.length : "null"));
+//                    sanPham.getSanPhamChiTietList().add(newChiTiet);
 //                }
-//                System.out.println("Đang kiểm tra hình ảnh: " + (imageBytes != null ? imageBytes.length : "null"));
-//                if (imageBytes == null || imageBytes.length == 0) {
-//                    throw new IllegalArgumentException("Hình ảnh không hợp lệ!");
-//                }
-
-                if (existingChiTiet != null) {
-                    existingChiTiet.setSoluongsanpham(existingChiTiet.getSoluongsanpham() + chiTietDTO.getSoLuong());
-                } else {
-                    SanPhamChiTiet newChiTiet = new SanPhamChiTiet();
-                    newChiTiet.setMauSac(mauSac);
-                    newChiTiet.setKichThuoc(kichThuoc);
-                    newChiTiet.setDongia(chiTietDTO.getGia());
-                    newChiTiet.setSoluongsanpham(chiTietDTO.getSoLuong());
-                    newChiTiet.setSanPham(sanPham);
-                    newChiTiet.setAnhSanPhamChiTiet(null);
-//                    System.out.println("Mã ảnh: " + (imageBytes != null ? imageBytes.length : "null"));
-                    sanPham.getSanPhamChiTietList().add(newChiTiet);
-                }
-            });
-        }
-        sanPhamRepository.save(sanPham);
+//            });
+//        }
+//        sanPhamRepository.save(sanPham);
+//    }
+@Transactional
+public void saveSanPham(SanPhamDTO sanPhamDTO) {
+    if (sanPhamDTO == null || sanPhamDTO.getTenSanPham() == null) {
+        throw new IllegalArgumentException("Thông tin sản phẩm không hợp lệ!");
     }
+
+    SanPham sanPham = sanPhamRepository.findById(sanPhamDTO.getTenSanPham())
+            .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tìm thấy với tên: " + sanPhamDTO.getTenSanPham()));
+
+    // Tìm các thông tin liên quan như danh mục, thương hiệu, chất liệu, nhà sản xuất, cổ áo
+    DanhMuc danhMuc = danhMucRepository.findById(sanPhamDTO.getDanhMucId())
+            .orElseThrow(() -> new EntityNotFoundException("Danh mục không tìm thấy với ID: " + sanPhamDTO.getDanhMucId()));
+    sanPham.setDanhMuc(danhMuc);
+
+    ThuongHieu thuongHieu = thuongHieuRepository.findById(sanPhamDTO.getThuongHieuId())
+            .orElseThrow(() -> new EntityNotFoundException("Thương hiệu không tìm thấy với ID: " + sanPhamDTO.getThuongHieuId()));
+    sanPham.setThuongHieu(thuongHieu);
+
+    ChatLieu chatLieu = chatLieuRespository.findById(sanPhamDTO.getChatLieuId())
+            .orElseThrow(() -> new EntityNotFoundException("Chất liệu không tìm thấy với ID: " + sanPhamDTO.getChatLieuId()));
+    sanPham.setChatLieu(chatLieu);
+
+    NhaSanXuat nhaSanXuat = nsxRepository.findById(sanPhamDTO.getNhaSanXuatId())
+            .orElseThrow(() -> new EntityNotFoundException("Nhà sản xuất không tìm thấy với ID: " + sanPhamDTO.getNhaSanXuatId()));
+    sanPham.setNhaSanXuat(nhaSanXuat);
+
+    CoAo coAo = coAoRepository.findById(sanPhamDTO.getCoAoId())
+            .orElseThrow(() -> new EntityNotFoundException("Cổ áo không tìm thấy với ID: " + sanPhamDTO.getCoAoId()));
+    sanPham.setCoAo(coAo);
+
+    // Duyệt qua từng chi tiết sản phẩm trong DTO
+    if (sanPhamDTO.getChiTietSanPham() != null) {
+        List<SanPhamChiTiet> existingChiTietList = sanPham.getSanPhamChiTietList();
+
+        sanPhamDTO.getChiTietSanPham().forEach(chiTietDTO -> {
+            String colorInput = chiTietDTO.getMauSac();
+            String color = colorInput.contains(":") ? colorInput.split(":")[1].trim() : colorInput;
+
+            // Tìm màu sắc và kích thước
+            MauSac mauSac = mauSacRepsitory.findByTen(color)
+                    .orElseThrow(() -> new EntityNotFoundException("Màu sắc không tìm thấy với tên: " + color));
+            KichThuoc kichThuoc = kichThuocRepository.findByten(chiTietDTO.getKichThuoc())
+                    .orElseThrow(() -> new EntityNotFoundException("Kích thước không tìm thấy với tên: " + chiTietDTO.getKichThuoc()));
+
+            SanPhamChiTiet existingChiTiet = existingChiTietList.stream()
+                    .filter(chiTiet -> chiTiet.getMauSac().equals(mauSac) && chiTiet.getKichThuoc().equals(kichThuoc))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingChiTiet != null) {
+                existingChiTiet.setSoluongsanpham(existingChiTiet.getSoluongsanpham() + chiTietDTO.getSoLuong());
+                existingChiTiet.setDongia(chiTietDTO.getGia());
+                existingChiTiet.setAnhSanPhamChiTiet(chiTietDTO.getImages() != null ? chiTietDTO.getImages() : existingChiTiet.getAnhSanPhamChiTiet());
+            } else {
+                SanPhamChiTiet newChiTiet = new SanPhamChiTiet();
+                newChiTiet.setMauSac(mauSac);
+                newChiTiet.setKichThuoc(kichThuoc);
+                newChiTiet.setDongia(chiTietDTO.getGia());
+                newChiTiet.setSoluongsanpham(chiTietDTO.getSoLuong());
+                newChiTiet.setSanPham(sanPham);
+                newChiTiet.setNgaytao(LocalDate.now());
+                newChiTiet.setAnhSanPhamChiTiet(chiTietDTO.getImages());
+                sanPham.getSanPhamChiTietList().add(newChiTiet);
+            }
+        });
+    }
+
+    // Cập nhật tổng số lượng sản phẩm sau khi thêm hoặc cập nhật các chi tiết sản phẩm
+    List<SanPhamChiTiet> chiTietSanPhamList = sanPham.getSanPhamChiTietList();
+
+    // Kiểm tra và tính tổng số lượng sản phẩm từ chi tiết sản phẩm
+    int totalQuantity = chiTietSanPhamList.stream()
+            .filter(chitiet -> chitiet.getSoluongsanpham() != null)
+            .mapToInt(SanPhamChiTiet::getSoluongsanpham)
+            .sum();
+    sanPham.setSoluongsp(totalQuantity);
+
+    // In ra tổng số lượng sản phẩm
+    System.out.println("Tổng số lượng sản phẩm: " + totalQuantity);
+
+    sanPhamRepository.save(sanPham);
+}
 
     public Optional<SanPham> findSanPhamById(Integer id) {
         return sanPhamRepository.findById(id);
@@ -385,7 +483,8 @@ public class SanPhamService {
     }
 
 
-
+    public List<SanPham> findByDanhMuc(DanhMuc danhMuc) { return sanPhamRepository.findByDanhMuc(danhMuc); }
+//    public List<SanPham> findAllByOrderByGiaAsc() { return sanPhamRepository.findAllByOrderByNgaytaoDesc(); } public List<SanPham> findAllByOrderByNgayTaoDesc() { return sanPhamRepository.findAllByOrderByNgayTaoDesc(); }
     public SanPham Listtimkiemsp(Integer id) {
         return  sanPhamRepository.findById(id).orElse(null);
     }
@@ -405,13 +504,13 @@ public class SanPhamService {
 
 
 
-        public int findIdBySizeAndColorId(Integer sizeId, Integer colorId) {
-            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findBySizeIdAndColorId(sizeId, colorId);
-            if (sanPhamChiTiet != null) {
-                return sanPhamChiTiet.getId();
-            } else {
-                throw new RuntimeException("Không tìm thấy sản phẩm chi tiết với kích thước và màu sắc đã chọn.");
-            }
-
-        }
+//        public int findIdBySizeAndColorId(Integer sizeId, Integer colorId,Integer productId) {
+//            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findBySizeIdColorIdAndProductId(sizeId, colorId,productId);
+//            if (sanPhamChiTiet != null) {
+//                return sanPhamChiTiet.getId();
+//            } else {
+//                throw new RuntimeException("Không tìm thấy sản phẩm chi tiết với kích thước và màu sắc đã chọn.");
+//            }
+//
+//        }
 }
