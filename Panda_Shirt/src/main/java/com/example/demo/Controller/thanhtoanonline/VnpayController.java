@@ -5,6 +5,7 @@ import com.example.demo.DTO.TaiKhoanDTO;
 import com.example.demo.entity.*;
 import com.example.demo.respository.HoaDonCTRepository;
 import com.example.demo.respository.HoaDonRepository;
+import com.example.demo.respository.SanPhamChiTietRepository;
 import com.example.demo.respository.nhanVien.DonHangRepository;
 import com.example.demo.service.GioHangService;
 import com.example.demo.service.HoaDonService;
@@ -44,6 +45,8 @@ public class VnpayController {
     private DonHangRepository donHangRepository;
     @Autowired
     private HoaDonCTRepository hoaDonCTRepository;
+    @Autowired
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
     @PostMapping("/submitOrder")
     public String submitOrder(@RequestParam("totalAmount") double totalAmount,
                               @RequestParam("orderInfo") String orderInfo,
@@ -157,6 +160,7 @@ public class VnpayController {
         hoaDon.setMahoadon(mahd);
         hoaDon.setKhachHang(khachHang);
         hoaDon.setTongtien(BigDecimal.valueOf(totalAmount));
+        hoaDon.setThanhtien(BigDecimal.valueOf(totalAmount));
         hoaDon.setNgaytao(LocalDate.now());
         hoaDon.setNgaymua(LocalDate.now());
         hoaDon.setTrangthai(1);
@@ -188,6 +192,15 @@ public class VnpayController {
             chiTiet.setHinhthucthanhtoan(paymentMethod);
             chiTiet.setHoaDon(hoaDon);
             chiTietList.add(chiTiet);
+
+            // Giảm số lượng sản phẩm trong kho
+            SanPhamChiTiet sanPhamChiTiet = item.getSanPhamChiTiet();
+            int soLuongConLai = sanPhamChiTiet.getSoluongsanpham() - item.getSoluong();
+            if (soLuongConLai < 0) {
+                throw new RuntimeException("Số lượng sản phẩm không đủ");
+            }
+            sanPhamChiTiet.setSoluongsanpham(soLuongConLai);
+            sanPhamChiTietRepository.save(sanPhamChiTiet);
         }
         hoaDon.setChiTietHoaDons(chiTietList);
         return hoaDon;
@@ -199,6 +212,7 @@ public class VnpayController {
         donHang.setKhachHang(khachHang);
         donHang.setNgaytao(LocalDate.now());
         donHang.setTongtien(BigDecimal.valueOf(totalAmount));
+
         donHang.setDiaChi(khachHang.getDiachi());
         donHang.setSdt(khachHang.getSdt());
         donHang.setTrangThai("Chờ duyệt");

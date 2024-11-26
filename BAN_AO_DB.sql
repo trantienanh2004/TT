@@ -65,7 +65,7 @@ CREATE TABLE SAN_PHAM (
 ID INT IDENTITY(1,1) PRIMARY KEY,
 MA_SAN_PHAM VARCHAR(12) ,
 TEN_SAN_PHAM NVARCHAR(255),
-ANH_SAN_PHAM NVARCHAR(255),
+ANH_SAN_PHAM VARBINARY(MAX),
 NGAY_TAO DATETIME DEFAULT GETDATE(),
 NGAY_SUA DATETIME,
 ID_DANH_MUC INT,
@@ -593,17 +593,27 @@ delete danh_muc where TEN_DANH_MUC = 'áo có quai'
 SELECT * FROM Voucher
 WHERE trang_Thai  LIKE N'Đang hoạt động';
 
-ALTER TABLE Voucher
-ALTER COLUMN Trang_thai int
+
+-- Nếu cột là NVARCHAR chứa base64, bạn cần chuyển dữ liệu trước khi thay đổi kiểu cột
+DELETE FROM SAN_PHAM_CHI_TIET
+WHERE id = 2;
+
+
+ALTER TABLE SAN_PHAM ALTER COLUMN ANH_SAN_PHAM VARBINARY(MAX);
+
 
 update hoa_don
 set thanh_tien  = 1023102
-where ID = 23
+where ID = 2
 
 
 ALTER TABLE don_hang
 ADD trang_thai_offline BIT;
 
+select * from SAN_PHAM_CHI_TIET
+delete
+from SAN_PHAM_CHI_TIET
+where id =10
 
 ----test ở đây nè , đăng nhập ở đây này
 
